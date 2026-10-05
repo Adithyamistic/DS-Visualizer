@@ -1,0 +1,2097 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AR Data Structure Visualizer</title>
+
+    <!-- A-FRAME -->
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+
+    <!-- AR.JS -->
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+
+
+        /* =========================================
+           MAIN CONTROL PANEL
+        ========================================= */
+
+        #panel {
+
+            position: fixed;
+
+            top: 12px;
+            left: 12px;
+
+            width: 290px;
+
+            padding: 15px;
+
+            background: rgba(8, 15, 22, 0.93);
+
+            color: white;
+
+            border-radius: 16px;
+
+            z-index: 1000;
+
+            box-shadow: 0 6px 25px rgba(0,0,0,0.4);
+
+            backdrop-filter: blur(8px);
+        }
+
+
+        #panel h1 {
+
+            margin: 0;
+
+            text-align: center;
+
+            color: #45b6ff;
+
+            font-size: 21px;
+        }
+
+
+        #subtitle {
+
+            text-align: center;
+
+            color: #cccccc;
+
+            font-size: 11px;
+
+            margin: 5px 0 13px;
+        }
+
+
+        /* =========================================
+           MODE SELECTION
+        ========================================= */
+
+        #modeSelection {
+
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 7px;
+        }
+
+
+        #stackMode {
+
+            background: #45b6ff;
+
+            color: white;
+        }
+
+
+        #queueMode {
+
+            background: #45d6a0;
+
+            color: white;
+        }
+
+
+        /* =========================================
+           OPERATION PANEL
+        ========================================= */
+
+        #operations {
+
+            display: none;
+        }
+
+
+        #valueInput {
+
+            width: 100%;
+
+            padding: 9px;
+
+            border: none;
+
+            border-radius: 8px;
+
+            margin-bottom: 7px;
+
+            font-size: 13px;
+
+            text-align: center;
+        }
+
+
+        .operationButtons {
+
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 7px;
+        }
+
+
+        button {
+
+            border: none;
+
+            border-radius: 8px;
+
+            padding: 10px 5px;
+
+            background: white;
+
+            color: #111;
+
+            font-size: 12px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+
+        button:hover {
+
+            transform: scale(1.02);
+
+            background: #e5f5ff;
+        }
+
+
+        #pushButton {
+
+            background: #45b6ff;
+
+            color: white;
+        }
+
+
+        #popButton {
+
+            background: #ff6b6b;
+
+            color: white;
+        }
+
+
+        #peekButton {
+
+            background: #ffd34d;
+
+            color: #111;
+        }
+
+
+        #enqueueButton {
+
+            background: #45d6a0;
+
+            color: white;
+        }
+
+
+        #dequeueButton {
+
+            background: #ff6b6b;
+
+            color: white;
+        }
+
+
+        #frontButton {
+
+            background: #ffd34d;
+
+            color: #111;
+        }
+
+
+        #resetButton {
+
+            background: #dddddd;
+
+            color: #111;
+        }
+
+
+        #backButton {
+
+            margin-top: 7px;
+
+            width: 100%;
+
+            background: #555;
+
+            color: white;
+        }
+
+
+        /* =========================================
+           INFORMATION
+        ========================================= */
+
+        #info {
+
+            margin-top: 10px;
+
+            padding: 10px;
+
+            background: rgba(255,255,255,0.10);
+
+            border-radius: 9px;
+
+            text-align: center;
+
+            font-size: 11px;
+
+            line-height: 1.5;
+
+            min-height: 65px;
+        }
+
+
+        #dataStatus {
+
+            margin-top: 8px;
+
+            padding: 8px;
+
+            background: rgba(69,182,255,0.15);
+
+            border-radius: 8px;
+
+            text-align: center;
+
+            font-size: 11px;
+
+            color: #8ed6ff;
+        }
+
+
+        /* =========================================
+           AR STATUS
+        ========================================= */
+
+        #status {
+
+            position: fixed;
+
+            bottom: 15px;
+
+            left: 50%;
+
+            transform: translateX(-50%);
+
+            padding: 8px 16px;
+
+            background: rgba(0,0,0,0.82);
+
+            color: white;
+
+            border-radius: 18px;
+
+            z-index: 1000;
+
+            font-size: 11px;
+
+            white-space: nowrap;
+        }
+
+
+        /* =========================================
+           MODE LABEL
+        ========================================= */
+
+        #modeLabel {
+
+            display: none;
+
+            margin-top: 10px;
+
+            padding: 8px;
+
+            border-radius: 8px;
+
+            text-align: center;
+
+            font-weight: bold;
+
+            font-size: 13px;
+
+            background: rgba(69,182,255,0.18);
+
+            color: #45b6ff;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =================================================
+     CONTROL PANEL
+================================================= -->
+
+<div id="panel">
+
+    <h1>📚 AR Data Structures</h1>
+
+    <div id="subtitle">
+        Interactive 3D Data Structure Visualizer
+    </div>
+
+
+    <!-- =============================================
+         INITIAL CHOICE
+    ============================================== -->
+
+    <div id="modeSelection">
+
+        <button
+            id="stackMode"
+            onclick="chooseMode('stack')">
+
+            📚 STACK
+
+        </button>
+
+
+        <button
+            id="queueMode"
+            onclick="chooseMode('queue')">
+
+            🚶 QUEUE
+
+        </button>
+
+    </div>
+
+
+    <!-- =============================================
+         CURRENT MODE
+    ============================================== -->
+
+    <div id="modeLabel">
+        STACK
+    </div>
+
+
+    <!-- =============================================
+         OPERATIONS
+    ============================================== -->
+
+    <div id="operations">
+
+        <input
+            id="valueInput"
+            type="number"
+            placeholder="Enter value"
+            value="10">
+
+
+        <!-- STACK BUTTONS -->
+
+        <div
+            id="stackButtons"
+            class="operationButtons">
+
+            <button
+                id="pushButton"
+                onclick="pushValue()">
+
+                PUSH
+
+            </button>
+
+
+            <button
+                id="popButton"
+                onclick="popValue()">
+
+                POP
+
+            </button>
+
+
+            <button
+                id="peekButton"
+                onclick="peekValue()">
+
+                PEEK
+
+            </button>
+
+
+            <button
+                id="resetButton"
+                onclick="resetData()">
+
+                RESET
+
+            </button>
+
+        </div>
+
+
+        <!-- QUEUE BUTTONS -->
+
+        <div
+            id="queueButtons"
+            class="operationButtons"
+            style="display:none;">
+
+            <button
+                id="enqueueButton"
+                onclick="enqueueValue()">
+
+                ENQUEUE
+
+            </button>
+
+
+            <button
+                id="dequeueButton"
+                onclick="dequeueValue()">
+
+                DEQUEUE
+
+            </button>
+
+
+            <button
+                id="frontButton"
+                onclick="frontValue()">
+
+                FRONT
+
+            </button>
+
+
+            <button
+                id="resetButton"
+                onclick="resetData()">
+
+                RESET
+
+            </button>
+
+        </div>
+
+
+        <button
+            id="backButton"
+            onclick="backToSelection()">
+
+            ← Change Data Structure
+
+        </button>
+
+
+        <!-- INFORMATION -->
+
+        <div id="info">
+
+            Perform an operation
+            to visualize the data structure.
+
+        </div>
+
+
+        <!-- DATA STATUS -->
+
+        <div id="dataStatus">
+
+            Stack: [ ]
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =================================================
+     AR TRACKING STATUS
+================================================= -->
+
+<div id="status">
+
+    🔍 Looking for Hiro marker...
+
+</div>
+
+
+
+<!-- =================================================
+     AR SCENE
+================================================= -->
+
+<a-scene
+
+    embedded
+
+    arjs="sourceType: webcam;"
+
+    vr-mode-ui="enabled: false"
+
+    renderer="antialias: true; alpha: true;">
+
+
+    <!-- =================================================
+         HIRO MARKER
+    ================================================= -->
+
+    <a-marker
+
+        id="hiroMarker"
+
+        preset="hiro">
+
+
+        <!-- =================================================
+             AR CONTENT
+        ================================================= -->
+
+        <a-entity
+
+            id="arContent"
+
+            position="0 0 0"
+
+            rotation="-5 -20 0"
+
+            scale="0.50 0.50 0.50">
+
+
+            <!-- =============================================
+                 TITLE
+            ============================================== -->
+
+            <a-text
+
+                id="arTitle"
+
+                value="DATA STRUCTURES"
+
+                position="0 2.25 0"
+
+                align="center"
+
+                color="#45b6ff"
+
+                width="4">
+
+            </a-text>
+
+
+            <!-- =============================================
+                 SUBTITLE
+            ============================================== -->
+
+            <a-text
+
+                id="arSubtitle"
+
+                value="STACK & QUEUE"
+
+                position="0 1.95 0"
+
+                align="center"
+
+                color="white"
+
+                width="2.8">
+
+            </a-text>
+
+
+            <!-- =================================================
+                 START SCREEN
+            ================================================= -->
+
+            <a-entity
+                id="startScreen">
+
+
+                <a-box
+
+                    position="0 0.85 0"
+
+                    width="2.3"
+
+                    height="1.2"
+
+                    depth="0.15"
+
+                    color="#17212b">
+
+                </a-box>
+
+
+                <a-text
+
+                    value="CHOOSE A DATA STRUCTURE"
+
+                    position="0 1.15 0.10"
+
+                    align="center"
+
+                    color="#45b6ff"
+
+                    width="2.5">
+
+                </a-text>
+
+
+                <a-text
+
+                    value="STACK  |  QUEUE"
+
+                    position="0 0.65 0.10"
+
+                    align="center"
+
+                    color="white"
+
+                    width="2.0">
+
+                </a-text>
+
+            </a-entity>
+
+
+            <!-- =================================================
+                 STACK VISUAL
+            ================================================= -->
+
+            <a-entity
+                id="stackVisual"
+                visible="false">
+
+
+                <!-- Base -->
+
+                <a-box
+
+                    position="0 0.15 0"
+
+                    width="1.65"
+
+                    height="0.20"
+
+                    depth="1.1"
+
+                    color="#202830">
+
+                </a-box>
+
+
+                <!-- Left support -->
+
+                <a-box
+
+                    position="-0.72 0.95 0"
+
+                    width="0.12"
+
+                    height="1.75"
+
+                    depth="1.0"
+
+                    color="#45b6ff">
+
+                </a-box>
+
+
+                <!-- Right support -->
+
+                <a-box
+
+                    position="0.72 0.95 0"
+
+                    width="0.12"
+
+                    height="1.75"
+
+                    depth="1.0"
+
+                    color="#45b6ff">
+
+                </a-box>
+
+
+                <!-- Blocks -->
+
+                <a-entity
+
+                    id="stackContainer"
+
+                    position="0 0.30 0">
+
+                </a-entity>
+
+
+                <!-- Top indicator -->
+
+                <a-entity
+
+                    id="stackTopIndicator"
+
+                    visible="false">
+
+
+                    <a-text
+
+                        value="TOP"
+
+                        position="1.05 0 0"
+
+                        color="#ffd34d"
+
+                        width="1.5"
+
+                        align="center">
+
+                    </a-text>
+
+
+                    <a-cone
+
+                        radius-bottom="0.10"
+
+                        radius-top="0"
+
+                        height="0.20"
+
+                        rotation="0 0 -90"
+
+                        position="0.80 0 0"
+
+                        color="#ffd34d">
+
+                    </a-cone>
+
+                </a-entity>
+
+
+            </a-entity>
+
+
+            <!-- =================================================
+                 QUEUE VISUAL
+            ================================================= -->
+
+            <a-entity
+
+                id="queueVisual"
+
+                visible="false">
+
+
+                <!-- Base -->
+
+                <a-box
+
+                    position="0 0.15 0"
+
+                    width="3.2"
+
+                    height="0.20"
+
+                    depth="1.0"
+
+                    color="#202830">
+
+                </a-box>
+
+
+                <!-- Left support -->
+
+                <a-box
+
+                    position="-1.55 0.70 0"
+
+                    width="0.12"
+
+                    height="1.15"
+
+                    depth="0.9"
+
+                    color="#45d6a0">
+
+                </a-box>
+
+
+                <!-- Right support -->
+
+                <a-box
+
+                    position="1.55 0.70 0"
+
+                    width="0.12"
+
+                    height="1.15"
+
+                    depth="0.9"
+
+                    color="#45d6a0">
+
+                </a-box>
+
+
+                <!-- Queue blocks -->
+
+                <a-entity
+
+                    id="queueContainer"
+
+                    position="0 0.30 0">
+
+                </a-entity>
+
+
+                <!-- FRONT -->
+
+                <a-text
+
+                    value="FRONT →"
+
+                    position="-1.75 1.15 0"
+
+                    align="center"
+
+                    color="#ff6b6b"
+
+                    width="1.7">
+
+                </a-text>
+
+
+                <!-- REAR -->
+
+                <a-text
+
+                    value="← REAR"
+
+                    position="1.75 1.15 0"
+
+                    align="center"
+
+                    color="#45d6a0"
+
+                    width="1.7">
+
+                </a-text>
+
+
+                <!-- Front indicator -->
+
+                <a-entity
+
+                    id="queueFrontIndicator"
+
+                    visible="false">
+
+
+                    <a-cone
+
+                        radius-bottom="0.10"
+
+                        radius-top="0"
+
+                        height="0.20"
+
+                        rotation="0 0 90"
+
+                        position="-1.35 0.85 0"
+
+                        color="#ff6b6b">
+
+                    </a-cone>
+
+
+                </a-entity>
+
+            </a-entity>
+
+
+            <!-- =================================================
+                 AR INFORMATION CARD
+            ================================================= -->
+
+            <a-entity
+
+                id="arInfoCard"
+
+                position="1.75 1.45 -0.1"
+
+                rotation="0 -12 0"
+
+                scale="0.72 0.72 0.72">
+
+
+                <a-plane
+
+                    width="1.8"
+
+                    height="1.05"
+
+                    color="#101820"
+
+                    opacity="0.94">
+
+                </a-plane>
+
+
+                <a-text
+
+                    id="arInfo"
+
+                    value="CHOOSE\nSTACK OR QUEUE"
+
+                    position="0 0 0.03"
+
+                    align="center"
+
+                    color="#45b6ff"
+
+                    width="2.2">
+
+                </a-text>
+
+            </a-entity>
+
+
+        </a-entity>
+
+
+    </a-marker>
+
+
+    <!-- CAMERA -->
+
+    <a-entity camera></a-entity>
+
+
+</a-scene>
+
+
+
+<!-- =================================================
+     JAVASCRIPT
+================================================= -->
+
+<script>
+
+
+/* =================================================
+   DATA
+================================================= */
+
+let mode = null;
+
+let stack = [];
+
+let queue = [];
+
+const MAX_SIZE = 6;
+
+
+
+/* =================================================
+   DOM
+================================================= */
+
+const stackVisual =
+    document.getElementById("stackVisual");
+
+const queueVisual =
+    document.getElementById("queueVisual");
+
+const startScreen =
+    document.getElementById("startScreen");
+
+const stackContainer =
+    document.getElementById("stackContainer");
+
+const queueContainer =
+    document.getElementById("queueContainer");
+
+const info =
+    document.getElementById("info");
+
+const dataStatus =
+    document.getElementById("dataStatus");
+
+const modeLabel =
+    document.getElementById("modeLabel");
+
+const operations =
+    document.getElementById("operations");
+
+const stackButtons =
+    document.getElementById("stackButtons");
+
+const queueButtons =
+    document.getElementById("queueButtons");
+
+const arTitle =
+    document.getElementById("arTitle");
+
+const arSubtitle =
+    document.getElementById("arSubtitle");
+
+const arInfo =
+    document.getElementById("arInfo");
+
+const stackTopIndicator =
+    document.getElementById("stackTopIndicator");
+
+const queueFrontIndicator =
+    document.getElementById("queueFrontIndicator");
+
+
+
+/* =================================================
+   MARKER TRACKING
+================================================= */
+
+const marker =
+    document.getElementById("hiroMarker");
+
+const status =
+    document.getElementById("status");
+
+
+marker.addEventListener(
+
+    "markerFound",
+
+    function() {
+
+        console.log(
+            "Hiro marker detected"
+        );
+
+        status.innerText =
+            "✅ AR marker detected";
+
+    }
+
+);
+
+
+marker.addEventListener(
+
+    "markerLost",
+
+    function() {
+
+        console.log(
+            "Hiro marker lost"
+        );
+
+        status.innerText =
+            "🔍 Looking for Hiro marker...";
+
+    }
+
+);
+
+
+
+/* =================================================
+   CHOOSE STACK / QUEUE
+================================================= */
+
+function chooseMode(selectedMode) {
+
+    mode = selectedMode;
+
+
+    /* Hide start screen */
+
+    startScreen.setAttribute(
+        "visible",
+        "false"
+    );
+
+
+    /* Show controls */
+
+    operations.style.display =
+        "block";
+
+    modeLabel.style.display =
+        "block";
+
+
+    if (mode === "stack") {
+
+        /* STACK */
+
+        modeLabel.innerText =
+            "📚 STACK — LIFO";
+
+        modeLabel.style.color =
+            "#45b6ff";
+
+        modeLabel.style.background =
+            "rgba(69,182,255,0.15)";
+
+
+        stackVisual.setAttribute(
+            "visible",
+            "true"
+        );
+
+        queueVisual.setAttribute(
+            "visible",
+            "false"
+        );
+
+
+        stackButtons.style.display =
+            "grid";
+
+        queueButtons.style.display =
+            "none";
+
+
+        arTitle.setAttribute(
+            "value",
+            "STACK"
+        );
+
+        arSubtitle.setAttribute(
+            "value",
+            "LIFO - LAST IN, FIRST OUT"
+        );
+
+
+        arInfo.setAttribute(
+            "value",
+            "STACK\nLIFO"
+        );
+
+
+        info.innerText =
+            "STACK selected.\n\n" +
+            "Enter a value and press PUSH.";
+
+
+        dataStatus.innerText =
+            "Stack: [ ]";
+
+    }
+
+
+    else {
+
+        /* QUEUE */
+
+        modeLabel.innerText =
+            "🚶 QUEUE — FIFO";
+
+        modeLabel.style.color =
+            "#45d6a0";
+
+        modeLabel.style.background =
+            "rgba(69,214,160,0.15)";
+
+
+        stackVisual.setAttribute(
+            "visible",
+            "false"
+        );
+
+        queueVisual.setAttribute(
+            "visible",
+            "true"
+        );
+
+
+        stackButtons.style.display =
+            "none";
+
+        queueButtons.style.display =
+            "grid";
+
+
+        arTitle.setAttribute(
+            "value",
+            "QUEUE"
+        );
+
+        arSubtitle.setAttribute(
+            "value",
+            "FIFO - FIRST IN, FIRST OUT"
+        );
+
+
+        arInfo.setAttribute(
+            "value",
+            "QUEUE\nFIFO"
+        );
+
+
+        info.innerText =
+            "QUEUE selected.\n\n" +
+            "Enter a value and press ENQUEUE.";
+
+
+        dataStatus.innerText =
+            "Queue: [ ]";
+
+    }
+
+}
+
+
+
+/* =================================================
+   CREATE STACK BLOCK
+================================================= */
+
+function createStackBlock(
+    value,
+    index
+) {
+
+    const block =
+        document.createElement(
+            "a-entity"
+        );
+
+
+    block.setAttribute(
+        "position",
+        `0 ${index * 0.32} 0`
+    );
+
+
+    const box =
+        document.createElement(
+            "a-box"
+        );
+
+
+    box.setAttribute(
+        "width",
+        "1.15"
+    );
+
+    box.setAttribute(
+        "height",
+        "0.27"
+    );
+
+    box.setAttribute(
+        "depth",
+        "0.80"
+    );
+
+
+    box.setAttribute(
+        "color",
+        getColor(index)
+    );
+
+
+    block.appendChild(box);
+
+
+    const text =
+        document.createElement(
+            "a-text"
+        );
+
+
+    text.setAttribute(
+        "value",
+        String(value)
+    );
+
+
+    text.setAttribute(
+        "position",
+        "0 0.01 0.41"
+    );
+
+
+    text.setAttribute(
+        "align",
+        "center"
+    );
+
+
+    text.setAttribute(
+        "color",
+        "white"
+    );
+
+
+    text.setAttribute(
+        "width",
+        "2.2"
+    );
+
+
+    block.appendChild(text);
+
+
+    stackContainer.appendChild(
+        block
+    );
+
+}
+
+
+
+/* =================================================
+   CREATE QUEUE BLOCK
+================================================= */
+
+function createQueueBlock(
+    value,
+    index
+) {
+
+    const block =
+        document.createElement(
+            "a-entity"
+        );
+
+
+    /*
+       Queue grows from LEFT
+       to RIGHT.
+    */
+
+    const x =
+        -1.20 + index * 0.48;
+
+
+    block.setAttribute(
+        "position",
+        `${x} 0.18 0`
+    );
+
+
+    const box =
+        document.createElement(
+            "a-box"
+        );
+
+
+    box.setAttribute(
+        "width",
+        "0.42"
+    );
+
+
+    box.setAttribute(
+        "height",
+        "0.42"
+    );
+
+
+    box.setAttribute(
+        "depth",
+        "0.70"
+    );
+
+
+    box.setAttribute(
+        "color",
+        getQueueColor(index)
+    );
+
+
+    block.appendChild(box);
+
+
+    const text =
+        document.createElement(
+            "a-text"
+        );
+
+
+    text.setAttribute(
+        "value",
+        String(value)
+    );
+
+
+    text.setAttribute(
+        "position",
+        "0 0 0.36"
+    );
+
+
+    text.setAttribute(
+        "align",
+        "center"
+    );
+
+
+    text.setAttribute(
+        "color",
+        "white"
+    );
+
+
+    text.setAttribute(
+        "width",
+        "1.2"
+    );
+
+
+    block.appendChild(text);
+
+
+    queueContainer.appendChild(
+        block
+    );
+
+}
+
+
+
+/* =================================================
+   COLORS
+================================================= */
+
+function getColor(index) {
+
+    const colors = [
+
+        "#2980b9",
+        "#3498db",
+        "#1abc9c",
+        "#16a085",
+        "#8e44ad",
+        "#9b59b6"
+
+    ];
+
+
+    return colors[
+        index % colors.length
+    ];
+
+}
+
+
+function getQueueColor(index) {
+
+    const colors = [
+
+        "#16a085",
+        "#1abc9c",
+        "#27ae60",
+        "#2ecc71",
+        "#3498db",
+        "#2980b9"
+
+    ];
+
+
+    return colors[
+        index % colors.length
+    ];
+
+}
+
+
+
+/* =================================================
+   RENDER STACK
+================================================= */
+
+function renderStack() {
+
+
+    while (
+        stackContainer.firstChild
+    ) {
+
+        stackContainer.removeChild(
+            stackContainer.firstChild
+        );
+
+    }
+
+
+    stack.forEach(
+
+        function(value, index) {
+
+            createStackBlock(
+                value,
+                index
+            );
+
+        }
+
+    );
+
+
+    dataStatus.innerText =
+        "Stack: [ " +
+        stack.join(", ") +
+        " ]";
+
+
+    if (stack.length > 0) {
+
+        arInfo.setAttribute(
+            "value",
+            "TOP\n" +
+            stack[stack.length - 1]
+        );
+
+    }
+
+    else {
+
+        arInfo.setAttribute(
+            "value",
+            "STACK\nEMPTY"
+        );
+
+    }
+
+}
+
+
+
+/* =================================================
+   RENDER QUEUE
+================================================= */
+
+function renderQueue() {
+
+
+    while (
+        queueContainer.firstChild
+    ) {
+
+        queueContainer.removeChild(
+            queueContainer.firstChild
+        );
+
+    }
+
+
+    queue.forEach(
+
+        function(value, index) {
+
+            createQueueBlock(
+                value,
+                index
+            );
+
+        }
+
+    );
+
+
+    dataStatus.innerText =
+        "Queue: [ " +
+        queue.join(", ") +
+        " ]";
+
+
+    if (queue.length > 0) {
+
+        arInfo.setAttribute(
+            "value",
+            "FRONT\n" +
+            queue[0]
+        );
+
+    }
+
+    else {
+
+        arInfo.setAttribute(
+            "value",
+            "QUEUE\nEMPTY"
+        );
+
+    }
+
+}
+
+
+
+/* =================================================
+   PUSH
+================================================= */
+
+function pushValue() {
+
+    const input =
+        document.getElementById(
+            "valueInput"
+        );
+
+
+    const value =
+        input.value;
+
+
+    if (value === "") {
+
+        info.innerText =
+            "Please enter a value.";
+
+        return;
+
+    }
+
+
+    if (stack.length >= MAX_SIZE) {
+
+        info.innerText =
+            "STACK OVERFLOW\n\n" +
+            "Maximum size reached.";
+
+        return;
+
+    }
+
+
+    stack.push(value);
+
+
+    renderStack();
+
+
+    info.innerText =
+        "PUSH operation\n\n" +
+        value +
+        " was added to the TOP.";
+
+    arInfo.setAttribute(
+        "value",
+        "PUSH\n" + value
+    );
+
+
+    input.value = "";
+
+}
+
+
+
+/* =================================================
+   POP
+================================================= */
+
+function popValue() {
+
+    if (stack.length === 0) {
+
+        info.innerText =
+            "STACK UNDERFLOW\n\n" +
+            "The stack is empty.";
+
+        return;
+
+    }
+
+
+    const removed =
+        stack.pop();
+
+
+    renderStack();
+
+
+    info.innerText =
+        "POP operation\n\n" +
+        removed +
+        " was removed from the TOP.";
+
+    arInfo.setAttribute(
+        "value",
+        "POP\n" + removed
+    );
+
+}
+
+
+
+/* =================================================
+   PEEK
+================================================= */
+
+function peekValue() {
+
+    if (stack.length === 0) {
+
+        info.innerText =
+            "STACK EMPTY";
+
+        return;
+
+    }
+
+
+    const top =
+        stack[stack.length - 1];
+
+
+    info.innerText =
+        "PEEK operation\n\n" +
+        "Top element = " +
+        top;
+
+
+    arInfo.setAttribute(
+        "value",
+        "TOP\n" + top
+    );
+
+
+    stackTopIndicator.setAttribute(
+        "visible",
+        "true"
+    );
+
+
+    stackTopIndicator.setAttribute(
+
+        "position",
+
+        `0 ${
+            0.3 +
+            (stack.length - 1) * 0.32 +
+            0.15
+        } 0`
+
+    );
+
+
+    setTimeout(
+
+        function() {
+
+            stackTopIndicator.setAttribute(
+                "visible",
+                "false"
+            );
+
+        },
+
+        2000
+
+    );
+
+}
+
+
+
+/* =================================================
+   ENQUEUE
+================================================= */
+
+function enqueueValue() {
+
+    const input =
+        document.getElementById(
+            "valueInput"
+        );
+
+
+    const value =
+        input.value;
+
+
+    if (value === "") {
+
+        info.innerText =
+            "Please enter a value.";
+
+        return;
+
+    }
+
+
+    if (queue.length >= MAX_SIZE) {
+
+        info.innerText =
+            "QUEUE FULL\n\n" +
+            "Maximum size reached.";
+
+        return;
+
+    }
+
+
+    queue.push(value);
+
+
+    renderQueue();
+
+
+    info.innerText =
+        "ENQUEUE operation\n\n" +
+        value +
+        " was added at the REAR.";
+
+    arInfo.setAttribute(
+        "value",
+        "ENQUEUE\n" + value
+    );
+
+
+    input.value = "";
+
+}
+
+
+
+/* =================================================
+   DEQUEUE
+================================================= */
+
+function dequeueValue() {
+
+    if (queue.length === 0) {
+
+        info.innerText =
+            "QUEUE EMPTY\n\n" +
+            "There is nothing to remove.";
+
+        return;
+
+    }
+
+
+    const removed =
+        queue.shift();
+
+
+    renderQueue();
+
+
+    info.innerText =
+        "DEQUEUE operation\n\n" +
+        removed +
+        " was removed from the FRONT.";
+
+    arInfo.setAttribute(
+        "value",
+        "DEQUEUE\n" + removed
+    );
+
+}
+
+
+
+/* =================================================
+   FRONT
+================================================= */
+
+function frontValue() {
+
+    if (queue.length === 0) {
+
+        info.innerText =
+            "QUEUE EMPTY";
+
+        return;
+
+    }
+
+
+    const front =
+        queue[0];
+
+
+    info.innerText =
+        "FRONT operation\n\n" +
+        "Front element = " +
+        front;
+
+
+    arInfo.setAttribute(
+        "value",
+        "FRONT\n" + front
+    );
+
+
+    queueFrontIndicator.setAttribute(
+        "visible",
+        "true"
+    );
+
+
+    setTimeout(
+
+        function() {
+
+            queueFrontIndicator.setAttribute(
+                "visible",
+                "false"
+            );
+
+        },
+
+        2000
+
+    );
+
+}
+
+
+
+/* =================================================
+   RESET
+================================================= */
+
+function resetData() {
+
+    stack = [];
+
+    queue = [];
+
+
+    renderStack();
+
+    renderQueue();
+
+
+    info.innerText =
+        mode === "stack"
+
+            ? "Stack reset.\n\nStack is empty."
+
+            : "Queue reset.\n\nQueue is empty.";
+
+}
+
+
+
+/* =================================================
+   BACK TO SELECTION
+================================================= */
+
+function backToSelection() {
+
+    mode = null;
+
+
+    operations.style.display =
+        "none";
+
+    modeLabel.style.display =
+        "none";
+
+
+    stackVisual.setAttribute(
+        "visible",
+        "false"
+    );
+
+    queueVisual.setAttribute(
+        "visible",
+        "false"
+    );
+
+
+    startScreen.setAttribute(
+        "visible",
+        "true"
+    );
+
+
+    arTitle.setAttribute(
+        "value",
+        "DATA STRUCTURES"
+    );
+
+    arSubtitle.setAttribute(
+        "value",
+        "STACK & QUEUE"
+    );
+
+
+    arInfo.setAttribute(
+        "value",
+        "CHOOSE\nSTACK OR QUEUE"
+    );
+
+
+    info.innerText =
+        "Choose Stack or Queue.";
+
+}
+
+
+
+/* =================================================
+   ENTER KEY
+================================================= */
+
+document
+    .getElementById("valueInput")
+    .addEventListener(
+
+        "keydown",
+
+        function(event) {
+
+            if (
+                event.key === "Enter"
+            ) {
+
+                if (mode === "stack") {
+
+                    pushValue();
+
+                }
+
+                else if (mode === "queue") {
+
+                    enqueueValue();
+
+                }
+
+            }
+
+        }
+
+    );
+
+</script>
+
+
+</body>
+
+</html>
