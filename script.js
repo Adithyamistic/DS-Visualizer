@@ -101,7 +101,7 @@ marker.addEventListener(
         console.log("Hiro marker detected");
 
         status.innerText =
-            "✅ AR marker detected";
+            "AR marker detected";
     }
 );
 
@@ -113,7 +113,7 @@ marker.addEventListener(
         console.log("Hiro marker lost");
 
         status.innerText =
-            "🔍 Looking for Hiro marker...";
+            "Looking for Hiro marker...";
     }
 );
 
@@ -143,13 +143,13 @@ function chooseMode(selectedMode) {
     if (mode === "stack") {
 
         modeLabel.innerText =
-            "📚 STACK — LIFO";
+            "STACK — LIFO";
 
         modeLabel.style.color =
-            "#45b6ff";
+            "#ffffff";
 
         modeLabel.style.background =
-            "rgba(69,182,255,0.15)";
+            "rgba(255,255,255,0.06)";
 
 
         stackVisual.setAttribute(
@@ -199,13 +199,13 @@ function chooseMode(selectedMode) {
     else {
 
         modeLabel.innerText =
-            "🚶 QUEUE — FIFO";
+            "QUEUE — FIFO";
 
         modeLabel.style.color =
-            "#45d6a0";
+            "#ffffff";
 
         modeLabel.style.background =
-            "rgba(69,214,160,0.15)";
+            "rgba(255,255,255,0.06)";
 
 
         stackVisual.setAttribute(
@@ -319,7 +319,7 @@ function createStackBlock(value, index) {
 
     text.setAttribute(
         "color",
-        "white"
+        "#080808"
     );
 
     text.setAttribute(
@@ -407,7 +407,7 @@ function createQueueBlock(value, index) {
 
     text.setAttribute(
         "color",
-        "white"
+        "#080808"
     );
 
     text.setAttribute(
@@ -431,14 +431,7 @@ function createQueueBlock(value, index) {
 
 function getColor(index) {
 
-    const colors = [
-        "#2980b9",
-        "#3498db",
-        "#1abc9c",
-        "#9b59b6",
-        "#e67e22",
-        "#e74c3c"
-    ];
+    const colors = ["#f5f5f5", "#d8d8d8", "#bcbcbc", "#9f9f9f", "#838383", "#666666"];
 
     return colors[
         index % colors.length
@@ -448,14 +441,7 @@ function getColor(index) {
 
 function getQueueColor(index) {
 
-    const colors = [
-        "#16a085",
-        "#27ae60",
-        "#2ecc71",
-        "#f1c40f",
-        "#e67e22",
-        "#e74c3c"
-    ];
+    const colors = ["#f5f5f5", "#d8d8d8", "#bcbcbc", "#9f9f9f", "#838383", "#666666"];
 
     return colors[
         index % colors.length
@@ -760,7 +746,7 @@ function pushValue() {
     if (stack.length >= MAX_SIZE) {
 
         showWarning(
-            "⚠️ STACK OVERFLOW — Array is full!"
+            "STACK OVERFLOW — Array is full!"
         );
 
         info.innerText =
@@ -801,7 +787,7 @@ function popValue() {
     if (stack.length === 0) {
 
         showWarning(
-            "⚠️ STACK UNDERFLOW — Stack is empty!"
+            "STACK UNDERFLOW — Stack is empty!"
         );
 
         info.innerText =
@@ -842,7 +828,7 @@ function peekValue() {
     if (stack.length === 0) {
 
         showWarning(
-            "⚠️ STACK UNDERFLOW — Stack is empty!"
+            "STACK UNDERFLOW — Stack is empty!"
         );
 
         info.innerText =
@@ -903,7 +889,7 @@ function enqueueValue() {
     if (queue.length >= MAX_SIZE) {
 
         showWarning(
-            "⚠️ QUEUE OVERFLOW — Array is full!"
+            "QUEUE OVERFLOW — Array is full!"
         );
 
         info.innerText =
@@ -943,7 +929,7 @@ function dequeueValue() {
     if (queue.length === 0) {
 
         showWarning(
-            "⚠️ QUEUE UNDERFLOW — Queue is empty!"
+            "QUEUE UNDERFLOW — Queue is empty!"
         );
 
         info.innerText =
@@ -984,7 +970,7 @@ function frontValue() {
     if (queue.length === 0) {
 
         showWarning(
-            "⚠️ QUEUE UNDERFLOW — Queue is empty!"
+            "QUEUE UNDERFLOW — Queue is empty!"
         );
 
         info.innerText =

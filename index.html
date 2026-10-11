@@ -1,1351 +1,300 @@
 <!DOCTYPE html>
-
 <html lang="en">
-
-
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
-
-    <title>AR Data Structure Visualizer</title>
-
-
-
-    <!-- A-FRAME -->
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#080808">
+    <title>DS / Spatial Studio</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-
-
-
-    <!-- AR.JS -->
-
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <link rel="stylesheet" href="style.css">
-
-
-
-
+    <script src="camera-controls.js"></script>
 </head>
-
-
-
-
-
 <body>
+    <div id="arViewport" aria-hidden="true"></div>
+    <header class="appHeader">
+        <div class="wordmark">DS<span>/</span><small>SPATIAL STUDIO</small></div>
+        <div class="sessionBadge"><span class="liveDot"></span> LIVE AR</div>
+    </header>
 
-
-
-
-
-<!-- =================================================*
-
-*     CONTROL PANEL*
-
-*================================================= -->
-
-
-
-<div id="panel">
-
-
-
-    <h1>📚 AR Data Structures</h1>
-
-
-
-    <div id="subtitle">
-
-        Interactive 3D Data Structure Visualizer
-
+    <div class="trackingCard">
+        <span class="trackingDot" aria-hidden="true"></span>
+        <div><div id="status" role="status">Looking for Hiro marker</div><small>Point your camera at the marker</small></div>
     </div>
 
-
-
-
-
-    <!-- =============================================*
-
-*         INITIAL CHOICE*
-
-*    ============================================== -->
-
-
-
-    <div id="modeSelection">
-
-
-
-        <button
-
-            id="stackMode"
-
-            onclick="chooseMode('stack')">
-
-
-
-            📚 STACK
-
-
-
-        </button>
-
-
-
-
-
-        <button
-
-            id="queueMode"
-
-            onclick="chooseMode('queue')">
-
-
-
-            🚶 QUEUE
-
-
-
-        </button>
-
-
-
+    <div id="cameraControls" role="group" aria-label="Camera zoom">
+        <span class="cameraLabel">VIEW</span>
+        <button id="zoomOut" type="button" aria-label="Zoom out" disabled>−</button>
+        <output id="zoomLevel" aria-live="polite">1.0×</output>
+        <button id="zoomIn" type="button" aria-label="Zoom in" disabled>+</button>
+        <button id="zoomReset" type="button" disabled>Reset</button>
+        <small id="cameraHint">Waiting for camera…</small>
     </div>
 
-
-
-
-
-    <!-- =============================================*
-
-*         CURRENT MODE*
-
-*    ============================================== -->
-
-
-
-    <div id="modeLabel">
-
-        STACK
-
-    </div>
-
-
-
-
-
-    <!-- =============================================*
-
-*         OPERATIONS*
-
-*    ============================================== -->
-
-
-
-    <div id="operations">
-
-
-
-        <input
-
-            id="valueInput"
-
-            type="number"
-
-            placeholder="Enter value"
-
-            value="10">
-
-
-
-
-
-        <!-- STACK BUTTONS -->
-
-
-
-        <div
-
-            id="stackButtons"
-
-            class="operationButtons">
-
-
-
-            <button
-
-                id="pushButton"
-
-                onclick="pushValue()">
-
-
-
-                PUSH
-
-
-
-            </button>
-
-
-
-
-
-            <button
-
-                id="popButton"
-
-                onclick="popValue()">
-
-
-
-                POP
-
-
-
-            </button>
-
-
-
-
-
-            <button
-
-                id="peekButton"
-
-                onclick="peekValue()">
-
-
-
-                PEEK
-
-
-
-            </button>
-
-
-
-
-
-            <button
-
-                id="queueResetButton"
-
-                onclick="resetData()">
-
-
-
-                RESET
-
-
-
-            </button>
-
-
-
+    <main id="panel">
+        <div class="panelHeader">
+            <div><div class="eyebrow">INTERACTIVE LAB / 01</div><h1>Data structures<span>.</span></h1></div>
+            <button id="panelToggle" class="iconButton" type="button" aria-label="Minimize controls" aria-expanded="true">−</button>
         </div>
-
-
-
-
-
-        <!-- QUEUE BUTTONS -->
-
-
-
-        <div
-
-            id="queueButtons"
-
-            class="operationButtons"
-
-            style="display:none;">
-
-
-
-            <button
-
-                id="enqueueButton"
-
-                onclick="enqueueValue()">
-
-
-
-                ENQUEUE
-
-
-
-            </button>
-
-
-
-
-
-            <button
-
-                id="dequeueButton"
-
-                onclick="dequeueValue()">
-
-
-
-                DEQUEUE
-
-
-
-            </button>
-
-
-
-
-
-            <button
-
-                id="frontButton"
-
-                onclick="frontValue()">
-
-
-
-                FRONT
-
-
-
-            </button>
-
-
-
-
-
-            <button
-
-                id="resetButton"
-
-                onclick="resetData()">
-
-
-
-                RESET
-
-
-
-            </button>
-
-
-
-        </div>
-
-
-
-
-
-        <button
-
-            id="backButton"
-
-            onclick="backToSelection()">
-
-
-
-            ← Change Data Structure
-
-
-
-        </button>
-
-
-
-
-
-        <!-- INFORMATION -->
-
-
-
-        <div id="info">
-
-
-
-            Perform an operation
-
-            to visualize the data structure.
-
-
-
-        </div>
-
-
-
-
-
-        <!-- DATA STATUS -->
-
-
-
-        <div id="dataStatus">
-
-
-
-            Stack: [ ]
-
-
-
-        </div>
-
-        <div id="arrayInfo">Array Size: 6 | Used: 0 / 6</div>
-
-        <div id="warning"></div>
-
-        <button id="pseudocodeButton" onclick="togglePseudocode()">📜 PSEUDOCODE</button>
-
-        <div id="pseudocodePanel">
-            <div class="pseudoHeader">
-                <span>Algorithm Pseudocode</span>
-                <button class="pseudoClose" onclick="togglePseudocode()">✕</button>
+        <div id="panelBody">
+            <div id="subtitle">Choose a structure. See every operation in space.</div>
+            <div id="modeSelection" role="group" aria-label="Data structure">
+                <button id="stackMode" type="button" onclick="chooseMode('stack')" aria-pressed="false"><span>Stack</span><small>Last in, first out</small><span class="modeArrow" aria-hidden="true">↗</span></button>
+                <button id="queueMode" type="button" onclick="chooseMode('queue')" aria-pressed="false"><span>Queue</span><small>First in, first out</small><span class="modeArrow" aria-hidden="true">↗</span></button>
             </div>
-
-            <div id="stackPseudo" class="pseudoSection">
-                <h3>📚 STACK</h3>
-                <h4>PUSH(value)</h4>
-                <pre>PUSH(value)
-1. If STACK is full
-      Display "Stack Overflow"
-      Stop
-2. TOP ← TOP + 1
-3. STACK[TOP] ← value
-4. Display updated Stack</pre>
-
-                <h4>POP()</h4>
-                <pre>POP()
-1. If TOP = -1
-      Display "Stack Underflow"
-      Stop
-2. value ← STACK[TOP]
-3. TOP ← TOP - 1
-4. Display updated Stack</pre>
+            <div id="modeLabel">STACK — LIFO</div>
+            <div id="operations">
+                <div class="inputRow"><label for="valueInput">VALUE</label><input id="valueInput" type="number" inputmode="decimal" placeholder="Enter a number" value="10"><span class="inputHint">↵</span></div>
+                <div id="stackButtons" class="operationButtons">
+                    <button id="pushButton" class="primaryAction" type="button" onclick="pushValue()"><span>Push</span><span aria-hidden="true">+</span></button>
+                    <button id="popButton" type="button" onclick="popValue()"><span>Pop</span><span aria-hidden="true">−</span></button>
+                    <button id="peekButton" type="button" onclick="peekValue()">Peek</button>
+                    <button id="queueResetButton" type="button" onclick="resetData()">Clear</button>
+                </div>
+                <div id="queueButtons" class="operationButtons" style="display:none">
+                    <button id="enqueueButton" class="primaryAction" type="button" onclick="enqueueValue()"><span>Enqueue</span><span aria-hidden="true">+</span></button>
+                    <button id="dequeueButton" type="button" onclick="dequeueValue()"><span>Dequeue</span><span aria-hidden="true">−</span></button>
+                    <button id="frontButton" type="button" onclick="frontValue()">Front</button>
+                    <button id="resetButton" type="button" onclick="resetData()">Clear</button>
+                </div>
+                <div id="info" role="status">Enter a value to begin.</div>
+                <div class="dataCard"><div class="dataHeader"><span>MEMORY</span><div id="arrayInfo">Array Size: 6 | Used: 0 / 6</div></div><div id="dataStatus">Stack: [ ]</div></div>
+                <div id="warning" role="alert"></div>
+                <div class="panelFooter"><button id="backButton" type="button" onclick="backToSelection()">← Start over</button><button id="pseudocodeButton" type="button" onclick="togglePseudocode()">View algorithm ↗</button></div>
             </div>
-
-            <div id="queuePseudo" class="pseudoSection" style="display:none;">
-                <h3 style="color:#45d6a0;">🚶 QUEUE</h3>
-                <h4>ENQUEUE(value)</h4>
-                <pre>ENQUEUE(value)
-1. If QUEUE is full
-      Display "Queue Overflow"
-      Stop
-2. If FRONT = -1
-      FRONT ← 0
-3. REAR ← REAR + 1
-4. QUEUE[REAR] ← value
-5. Display updated Queue</pre>
-
-                <h4>DEQUEUE()</h4>
-                <pre>DEQUEUE()
-1. If FRONT = -1 OR FRONT &gt; REAR
-      Display "Queue Underflow"
-      Stop
-2. value ← QUEUE[FRONT]
-3. FRONT ← FRONT + 1
-4. Display updated Queue</pre>
-            </div>
+            <div class="selectionHint">A new perspective on the fundamentals.</div>
         </div>
+    </main>
 
-
-
+    <div id="pseudocodePanel" role="dialog" aria-modal="true" aria-labelledby="algorithmTitle" tabindex="-1">
+        <div class="pseudoHeader"><div><div class="eyebrow">UNDER THE HOOD</div><span id="algorithmTitle">The algorithm.</span></div><button class="pseudoClose iconButton" type="button" aria-label="Close algorithm" onclick="togglePseudocode()">×</button></div>
+        <div id="stackPseudo" class="pseudoSection"><h3>Stack / LIFO</h3><h4>PUSH(value)</h4><pre>if stack is full: stop (overflow)
+TOP ← TOP + 1
+STACK[TOP] ← value
+display updated stack</pre><h4>POP()</h4><pre>if TOP = -1: stop (underflow)
+value ← STACK[TOP]
+TOP ← TOP - 1
+display updated stack</pre></div>
+        <div id="queuePseudo" class="pseudoSection" style="display:none"><h3>Queue / FIFO</h3><h4>ENQUEUE(value)</h4><pre>if queue is full: stop (overflow)
+append value to the rear
+display updated queue</pre><h4>DEQUEUE()</h4><pre>if queue is empty: stop (underflow)
+remove the front value
+shift remaining values forward
+display updated queue</pre></div>
     </div>
-
-
-
-</div>
-
-
-
-
-
-<!-- =================================================*
-
-*     AR TRACKING STATUS*
-
-*================================================= -->
-
-
-
-<div id="status">
-
-
-
-    🔍 Looking for Hiro marker...
-
-
-
-</div>
-
-
-
-
-
-
-
-<!-- =================================================*
-
-*     AR SCENE*
-
-*================================================= -->
-
-
-
-<a-scene
-
-
-
+    <a-scene
     embedded
-
-
-
+    camera-view
     arjs="sourceType: webcam;"
-
-
-
     vr-mode-ui="enabled: false"
-
-
-
     renderer="antialias: true; alpha: true;">
-
-
-
-
-
     <!-- =================================================*
-
 *         HIRO MARKER*
-
 *    ================================================= -->
-
-
-
     <a-marker
-
-
-
         id="hiroMarker"
-
-
-
         preset="hiro">
-
-
-
-
-
         <!-- =================================================*
-
 *             AR CONTENT*
-
 *        ================================================= -->
-
-
-
         <a-entity
-
-
-
             id="arContent"
-
-
-
             position="0 0 0"
-
-
-
             rotation="-5 -20 0"
-
-
-
             scale="0.50 0.50 0.50">
-
-
-
-
-
             <!-- =============================================*
-
 *                 TITLE*
-
 *            ============================================== -->
-
-
-
             <a-text
-
-
-
                 id="arTitle"
-
-
-
                 value="DATA STRUCTURES"
-
-
-
                 position="0 2.25 0"
-
-
-
                 align="center"
-
-
-
-                color="#45b6ff"
-
-
-
+                color="#ffffff"
                 width="4">
-
-
-
             </a-text>
-
-
-
-
-
             <!-- =============================================*
-
 *                 SUBTITLE*
-
 *            ============================================== -->
-
-
-
             <a-text
-
-
-
                 id="arSubtitle"
-
-
-
                 value="STACK & QUEUE"
-
-
-
                 position="0 1.95 0"
-
-
-
                 align="center"
-
-
-
                 color="white"
-
-
-
                 width="2.8">
-
-
-
             </a-text>
-
-
-
-
-
             <!-- =================================================*
-
 *                 START SCREEN*
-
 *            ================================================= -->
-
-
-
             <a-entity
-
                 id="startScreen">
-
-
-
-
-
                 <a-box
-
-
-
                     position="0 0.85 0"
-
-
-
                     width="2.3"
-
-
-
                     height="1.2"
-
-
-
                     depth="0.15"
-
-
-
-                    color="#17212b">
-
-
-
+                    color="#161616">
                 </a-box>
-
-
-
-
-
                 <a-text
-
-
-
                     value="CHOOSE A DATA STRUCTURE"
-
-
-
                     position="0 1.15 0.10"
-
-
-
                     align="center"
-
-
-
-                    color="#45b6ff"
-
-
-
+                    color="#ffffff"
                     width="2.5">
-
-
-
                 </a-text>
-
-
-
-
-
                 <a-text
-
-
-
                     value="STACK  |  QUEUE"
-
-
-
                     position="0 0.65 0.10"
-
-
-
                     align="center"
-
-
-
                     color="white"
-
-
-
                     width="2.0">
-
-
-
                 </a-text>
-
-
-
             </a-entity>
-
-
-
-
-
             <!-- =================================================*
-
 *                 STACK VISUAL*
-
 *            ================================================= -->
-
-
-
             <a-entity
-
                 id="stackVisual"
-
                 visible="false">
-
-
-
-
-
                 <!-- Base -->
-
-
-
                 <a-box
-
-
-
                     position="0 0.15 0"
-
-
-
                     width="1.65"
-
-
-
                     height="0.20"
-
-
-
                     depth="1.1"
-
-
-
-                    color="#202830">
-
-
-
+                    color="#242424">
                 </a-box>
-
-
-
-
-
                 <!-- Left support -->
-
-
-
                 <a-box
-
-
-
                     position="-0.72 0.95 0"
-
-
-
                     width="0.12"
-
-
-
                     height="1.75"
-
-
-
                     depth="1.0"
-
-
-
-                    color="#45b6ff">
-
-
-
+                    color="#ffffff">
                 </a-box>
-
-
-
-
-
                 <!-- Right support -->
-
-
-
                 <a-box
-
-
-
                     position="0.72 0.95 0"
-
-
-
                     width="0.12"
-
-
-
                     height="1.75"
-
-
-
                     depth="1.0"
-
-
-
-                    color="#45b6ff">
-
-
-
+                    color="#ffffff">
                 </a-box>
-
-
-
-
-
                 <!-- Blocks -->
-
-
-
                 <a-entity
-
-
-
                     id="stackContainer"
-
-
-
                     position="0 0.30 0">
-
-
-
                 </a-entity>
-
-
-
-
-
                 <!-- Top indicator -->
-
-
-
                 <a-entity
-
-
-
                     id="stackTopIndicator"
-
-
-
                     visible="false">
-
-
-
-
-
                     <a-text
-
-
-
                         value="TOP"
-
-
-
                         position="1.05 0 0"
-
-
-
-                        color="#ffd34d"
-
-
-
+                        color="#ffffff"
                         width="1.5"
-
-
-
                         align="center">
-
-
-
                     </a-text>
-
-
-
-
-
                     <a-cone
-
-
-
                         radius-bottom="0.10"
-
-
-
                         radius-top="0"
-
-
-
                         height="0.20"
-
-
-
                         rotation="0 0 -90"
-
-
-
                         position="0.80 0 0"
-
-
-
-                        color="#ffd34d">
-
-
-
+                        color="#ffffff">
                     </a-cone>
-
-
-
                 </a-entity>
-
-
-
-
-
             </a-entity>
-
-
-
-
-
             <!-- =================================================*
-
 *                 QUEUE VISUAL*
-
 *            ================================================= -->
-
-
-
             <a-entity
-
-
-
                 id="queueVisual"
-
-
-
                 visible="false">
-
-
-
-
-
                 <!-- Base -->
-
-
-
                 <a-box
-
-
-
                     position="0 0.15 0"
-
-
-
                     width="3.2"
-
-
-
                     height="0.20"
-
-
-
                     depth="1.0"
-
-
-
-                    color="#202830">
-
-
-
+                    color="#242424">
                 </a-box>
-
-
-
-
-
                 <!-- Left support -->
-
-
-
                 <a-box
-
-
-
                     position="-1.55 0.70 0"
-
-
-
                     width="0.12"
-
-
-
                     height="1.15"
-
-
-
                     depth="0.9"
-
-
-
-                    color="#45d6a0">
-
-
-
+                    color="#e5e5e5">
                 </a-box>
-
-
-
-
-
                 <!-- Right support -->
-
-
-
                 <a-box
-
-
-
                     position="1.55 0.70 0"
-
-
-
                     width="0.12"
-
-
-
                     height="1.15"
-
-
-
                     depth="0.9"
-
-
-
-                    color="#45d6a0">
-
-
-
+                    color="#e5e5e5">
                 </a-box>
-
-
-
-
-
                 <!-- Queue blocks -->
-
-
-
                 <a-entity
-
-
-
                     id="queueContainer"
-
-
-
                     position="0 0.30 0">
-
-
-
                 </a-entity>
-
                 <!-- Dynamic FRONT pointer -->
                 <a-entity id="queueFrontPointer" visible="false">
-                    <a-text value="FRONT" position="0 0.30 0" align="center" color="#ff6b6b" width="1.25"></a-text>
-                    <a-cone radius-bottom="0.09" radius-top="0" height="0.20" rotation="0 0 90" position="0 0.02 0" color="#ff6b6b"></a-cone>
+                    <a-text value="FRONT" position="0 0.30 0" align="center" color="#bdbdbd" width="1.25"></a-text>
+                    <a-cone radius-bottom="0.09" radius-top="0" height="0.20" rotation="0 0 90" position="0 0.02 0" color="#bdbdbd"></a-cone>
                 </a-entity>
-
                 <!-- Dynamic REAR pointer -->
                 <a-entity id="queueRearPointer" visible="false">
-                    <a-text value="REAR" position="0 0.30 0" align="center" color="#45d6a0" width="1.25"></a-text>
-                    <a-cone radius-bottom="0.09" radius-top="0" height="0.20" rotation="0 0 -90" position="0 0.02 0" color="#45d6a0"></a-cone>
+                    <a-text value="REAR" position="0 0.30 0" align="center" color="#e5e5e5" width="1.25"></a-text>
+                    <a-cone radius-bottom="0.09" radius-top="0" height="0.20" rotation="0 0 -90" position="0 0.02 0" color="#e5e5e5"></a-cone>
                 </a-entity>
-
                 <!-- Front indicator -->
-
-
-
                 <a-entity
-
-
-
                     id="queueFrontIndicator"
-
-
-
                     visible="false">
-
-
-
-
-
                     <a-cone
-
-
-
                         radius-bottom="0.10"
-
-
-
                         radius-top="0"
-
-
-
                         height="0.20"
-
-
-
                         rotation="0 0 90"
-
-
-
                         position="-1.35 0.85 0"
-
-
-
-                        color="#ff6b6b">
-
-
-
+                        color="#bdbdbd">
                     </a-cone>
-
-
-
-
-
                 </a-entity>
-
-
-
             </a-entity>
-
-
-
-
-
             <!-- =================================================*
-
 *                 AR INFORMATION CARD*
-
 *            ================================================= -->
-
-
-
             <a-entity
-
-
-
                 id="arInfoCard"
-
-
-
                 position="1.75 1.45 -0.1"
-
-
-
                 rotation="0 -12 0"
-
-
-
                 scale="0.72 0.72 0.72">
-
-
-
-
-
                 <a-plane
-
-
-
                     width="1.8"
-
-
-
                     height="1.05"
-
-
-
-                    color="#101820"
-
-
-
+                    color="#101010"
                     opacity="0.94">
-
-
-
                 </a-plane>
-
-
-
-
-
                 <a-text
-
-
-
                     id="arInfo"
-
-
-
                     value="CHOOSE\nSTACK OR QUEUE"
-
-
-
                     position="0 0 0.03"
-
-
-
                     align="center"
-
-
-
-                    color="#45b6ff"
-
-
-
+                    color="#ffffff"
                     width="2.2">
-
-
-
                 </a-text>
-
-
-
             </a-entity>
-
-
-
-
-
         </a-entity>
-
-
-
-
-
     </a-marker>
-
-
-
-
-
     <!-- CAMERA -->
-
-
-
     <a-entity camera></a-entity>
-
-
-
-
-
 </a-scene>
-
-
-
-
-
-
-
-<!-- =================================================*
-
-*     JAVASCRIPT*
-
-*================================================= -->
-<script src="script.js"></script>
-
+    <script src="script.js"></script>
+    <script src="app-ui.js"></script>
 </body>
-
-
-
 </html>

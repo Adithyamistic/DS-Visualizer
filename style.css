@@ -1,419 +1,134 @@
+:root { color-scheme: dark; --surface: #101010; --line: #ffffff1c; --muted: #898989; --text: #f5f5f5; }
+* { box-sizing: border-box; }
+html { background: #000; }
+body { width: 100vw !important; height: 100vh !important; margin: 0 !important; overflow: hidden; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; color: var(--text); -webkit-font-smoothing: antialiased; }
+button, input { font: inherit; }
+button { cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; border: 1px solid var(--line); color: var(--text); background: #1b1b1b; border-radius: 12px; min-height: 44px; transition: background .18s, border-color .18s, transform .15s; }
+button:hover { background: #292929; border-color: #ffffff42; }
+button:active { transform: scale(.96); }
+button:focus-visible, input:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+button:disabled { opacity: .3; cursor: default; transform: none; }
+.appHeader { position: fixed; left: 24px; right: 24px; top: max(22px, env(safe-area-inset-top)); display: flex; align-items: center; justify-content: space-between; z-index: 1000; pointer-events: none; }
+.wordmark { font-size: 29px; font-weight: 650; letter-spacing: -2px; display: flex; align-items: center; gap: 10px; text-shadow: 0 2px 15px #000; }
+.wordmark > span { color: #777; font-weight: 300; }
+.wordmark small { max-width: 75px; font-size: 9px; font-weight: 600; letter-spacing: 2px; line-height: 1.5; }
+.sessionBadge { display: flex; align-items: center; gap: 7px; font-size: 9px; letter-spacing: 1.5px; font-weight: 600; background: #101010e6; border: 1px solid var(--line); border-radius: 24px; padding: 9px 12px; }
+.liveDot { width: 5px; height: 5px; background: #fff; border-radius: 50%; }
+.trackingCard { position: fixed; top: 80px; left: 24px; z-index: 1000; display: flex; align-items: center; gap: 12px; background: #0c0c0ce6; border: 1px solid var(--line); border-radius: 14px; padding: 12px 16px; backdrop-filter: blur(20px); }
+.trackingDot { width: 8px; height: 8px; border: 1px solid #777; border-radius: 50%; flex-shrink: 0; }
+.trackingCard.isTracked .trackingDot { background: #fff; border-color: #fff; box-shadow: 0 0 12px #ffffff50; }
+#status { font-size: 11px; font-weight: 600; }
+.trackingCard small { display: block; margin-top: 4px; font-size: 9px; color: var(--muted); }
+#cameraControls { position: fixed; right: 24px; top: 80px; z-index: 1000; display: flex; align-items: center; flex-wrap: wrap; gap: 5px; width: 232px; padding: 9px; border: 1px solid var(--line); border-radius: 14px; background: #0c0c0ce6; backdrop-filter: blur(20px); }
+.cameraLabel { font-size: 8px; letter-spacing: 1.2px; color: var(--muted); margin: 0 5px; }
+#cameraControls button { min-width: 32px; min-height: 36px; border-radius: 8px; font-size: 17px; }
+#cameraControls #zoomReset { font-size: 10px; padding: 0 9px; background: transparent; }
+#zoomLevel { font-size: 11px; text-align: center; min-width: 39px; font-variant-numeric: tabular-nums; }
+#cameraHint { flex-basis: 100%; text-align: center; color: var(--muted); font-size: 9px; padding-top: 2px; }
+#panel { position: fixed; bottom: max(20px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); width: 420px; max-width: calc(100vw - 32px); max-height: calc(100dvh - 230px); z-index: 1100; padding: 22px; border: 1px solid #ffffff24; border-radius: 24px; background: #101010f5; box-shadow: 0 12px 70px #0009, inset 0 1px 0 #ffffff08; backdrop-filter: blur(24px); overflow-y: auto; scrollbar-width: thin; scrollbar-color: #444 transparent; }
+.panelHeader { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.eyebrow { color: var(--muted); font-size: 8px; font-weight: 600; letter-spacing: 1.8px; }
+#panel h1 { font-size: 24px; line-height: 1.2; font-weight: 550; letter-spacing: -1px; margin: 7px 0 0; }
+#panel h1 span { color: #777; }
+.iconButton { background: transparent; min-height: 36px; width: 36px; flex-shrink: 0; font-size: 20px; border-radius: 50%; }
+#subtitle { color: var(--muted); font-size: 11px; line-height: 1.6; margin: 13px 0 17px; }
+#modeSelection { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+#modeSelection button { position: relative; text-align: left; padding: 17px 15px; background: #181818; }
+#modeSelection button > span:first-child { display: block; font-weight: 500; font-size: 17px; letter-spacing: -.4px; }
+#modeSelection small { display: block; font-size: 10px; font-weight: 400; color: var(--muted); margin-top: 7px; }
+#modeSelection .modeArrow { position: absolute; top: 14px; right: 14px; color: #777; font-size: 17px; }
+#modeSelection button[aria-pressed=true] { color: #080808; background: #f3f3f3; border-color: #fff; }
+#modeSelection button[aria-pressed=true] small, #modeSelection button[aria-pressed=true] .modeArrow { color: #555; }
+#modeLabel { display: none; margin-top: 16px; border: 1px solid var(--line); padding: 8px 10px; border-radius: 8px; font-size: 9px; letter-spacing: 1.5px; font-weight: 500; }
+#operations { display: none; }
+.inputRow { display: flex; align-items: center; gap: 12px; margin: 12px 0; padding: 0 13px; background: #080808; border: 1px solid #ffffff20; border-radius: 10px; }
+.inputRow label { color: var(--muted); font-size: 8px; letter-spacing: 1.5px; }
+#valueInput { width: 100%; min-width: 0; padding: 13px 0; border: 0; background: transparent; color: #fff; font-size: 17px; font-variant-numeric: tabular-nums; outline-offset: 0; }
+.inputHint { color: #555; font-size: 16px; }
+.operationButtons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.operationButtons button { padding: 0 14px; display: flex; align-items: center; justify-content: space-between; font-size: 12px; }
+.operationButtons button:nth-child(n+3) { min-height: 36px; color: #aaa; background: transparent; justify-content: center; font-size: 10px; }
+.operationButtons .primaryAction { background: #f5f5f5; color: #080808; font-weight: 600; border-color: #f5f5f5; }
+.operationButtons .primaryAction:hover { background: #d8d8d8; }
+#info { margin-top: 13px; color: #bcbcbc; font-size: 10px; line-height: 1.6; white-space: pre-line; }
+.dataCard { margin-top: 13px; padding: 12px; border-radius: 10px; background: #080808; border: 1px solid var(--line); }
+.dataHeader { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.dataHeader > span { font-size: 8px; letter-spacing: 1.5px; color: var(--muted); }
+#arrayInfo { color: #777; font-size: 8px; }
+#dataStatus { margin-top: 8px; font-family: Consolas, monospace; font-size: 12px; color: #e0e0e0; overflow-wrap: anywhere; }
+#warning { display: none; margin-top: 10px; border-left: 2px solid #fff; padding: 9px 12px; background: #ffffff0a; font-size: 10px; line-height: 1.5; color: #fff; }
+.panelFooter { display: flex; justify-content: space-between; gap: 10px; border-top: 1px solid var(--line); margin-top: 14px; padding-top: 5px; }
+.panelFooter button { border: 0; background: transparent; padding: 6px 0; min-height: 36px; color: #999; font-size: 10px; }
+.panelFooter #pseudocodeButton { color: #eee; }
+.selectionHint { margin-top: 17px; text-align: center; font-size: 9px; letter-spacing: .2px; color: #666; }
+#panel.hasMode .selectionHint, #panel.hasMode #subtitle { display: none; }
+#panel.hasMode #modeSelection { margin-top: 16px; }
+#panel.hasMode #modeSelection button { padding: 11px 13px; }
+#panel.hasMode #modeSelection button > span:first-child { font-size: 13px; }
+#panel.hasMode #modeSelection small { font-size: 9px; margin-top: 4px; }
+#panel.isCollapsed #panelBody { display: none; }
+#pseudocodePanel { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); z-index: 2000; width: 420px; max-width: calc(100vw - 32px); max-height: 80dvh; overflow-y: auto; background: #111; border: 1px solid #ffffff30; border-radius: 22px; padding: 24px; box-shadow: 0 0 0 100vmax #000b, 0 20px 100px #000; }
+.pseudoHeader { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 24px; }
+#algorithmTitle { display: block; margin-top: 7px; font-size: 25px; letter-spacing: -1px; }
+.pseudoSection h3 { font-size: 13px; color: #aaa; font-weight: 400; }
+.pseudoSection h4 { margin: 22px 0 10px; font-size: 10px; letter-spacing: 1px; }
+.pseudoSection pre { white-space: pre-wrap; overflow-wrap: anywhere; color: #ccc; background: #080808; border: 1px solid var(--line); padding: 14px; border-radius: 10px; font-size: 11px; line-height: 1.8; }
+@media (max-width: 600px) { .appHeader { left: 18px; right: 18px; top: 18px; } .trackingCard { top: 73px; left: 18px; right: 18px; padding: 11px 13px; } #cameraControls { top: 140px; right: 18px; } #panel { padding: 18px; bottom: 16px; } #panel h1 { font-size: 22px; } }
+@media (max-height: 560px) and (min-width: 600px) { #panel { left: auto; right: 16px; transform: none; width: 340px; max-height: calc(100dvh - 90px); bottom: 16px; padding: 16px; } #cameraControls { top: auto; bottom: 18px; left: 18px; right: auto; } .trackingCard { left: 18px; max-width: 270px; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
 
-/* =================================================
-   GLOBAL STYLES
-================================================= */
-
-* {
-    box-sizing: border-box;
+/* The interaction dock and camera occupy separate parts of the screen. */
+#arViewport { position: fixed; top: 166px; left: 12px; right: 12px; bottom: calc(var(--dock-height, 240px) + 28px); pointer-events: none; }
+#panel { left: 50%; right: auto; transform: translateX(-50%); bottom: max(12px, env(safe-area-inset-bottom)); width: 480px; max-width: calc(100vw - 24px); max-height: 42dvh; padding: 12px 14px; border-radius: 20px; }
+#panel .eyebrow, #panel.hasMode #modeLabel { display: none !important; }
+#panel h1 { margin: 0; font-size: 17px; letter-spacing: -.5px; }
+#panel .iconButton { min-height: 28px; width: 28px; font-size: 16px; }
+#subtitle { font-size: 10px; margin: 8px 0; }
+#modeSelection, #panel.hasMode #modeSelection { margin-top: 8px; gap: 8px; }
+#modeSelection button, #panel.hasMode #modeSelection button { padding: 9px 12px; min-height: 36px; }
+#modeSelection button > span:first-child, #panel.hasMode #modeSelection button > span:first-child { font-size: 12px; }
+#modeSelection small, #modeSelection .modeArrow { display: none; }
+.inputRow { margin: 8px 0; }
+#valueInput { padding: 9px 0; font-size: 16px; }
+.operationButtons { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.operationButtons button, .operationButtons button:nth-child(n+3) { min-height: 42px; justify-content: center; padding: 0 5px; font-size: 10px; gap: 5px; }
+.operationButtons button > span[aria-hidden] { display: none; }
+#info { margin-top: 7px; font-size: 9px; line-height: 15px; max-height: 15px; overflow: hidden; }
+.dataCard { margin-top: 7px; padding: 8px 10px; display: flex; align-items: center; gap: 8px; }
+.dataHeader { margin-left: auto; order: 2; }
+.dataHeader > span { display: none; }
+#dataStatus { margin: 0; font-size: 10px; flex: 1; }
+#arrayInfo { font-size: 7px; }
+.panelFooter { margin-top: 6px; padding-top: 0; }
+.panelFooter button { min-height: 28px; font-size: 9px; }
+.selectionHint { margin-top: 10px; font-size: 8px; }
+#warning { padding: 5px 8px; margin-top: 6px; font-size: 9px; }
+#panel.hasMode .panelHeader { position: absolute; top: 12px; right: 14px; }
+#panel.hasMode .panelHeader > div { display: none; }
+#panel.hasMode #modeSelection { margin-top: 0; padding-right: 36px; }
+#panel.isCollapsed #panelBody { display: none !important; }
+#panel.isCollapsed .panelHeader { display: flex; position: static; }
+#panel.isCollapsed .panelHeader > div { display: block; }
+@media (max-width: 600px) {
+    .appHeader { top: 12px; }
+    .trackingCard { top: 60px; padding: 9px 12px; }
+    .trackingCard small { display: none; }
+    #cameraControls { top: 103px; padding: 6px 8px; }
+    #cameraControls button { min-height: 30px; }
+    #cameraHint { font-size: 8px; }
 }
-
-body {
-    margin: 0;
-    overflow: hidden;
-    font-family: Arial, sans-serif;
+@media (max-height: 560px) and (min-width: 600px) {
+    .appHeader { top: 10px; }
+    .trackingCard { top: 53px; padding: 8px 12px; }
+    .trackingCard small { display: none; }
+    #cameraControls { top: 48px; bottom: auto; left: auto; right: 18px; }
+    #arViewport { top: 112px; bottom: calc(var(--dock-height, 160px) + 24px); }
+    #panel { width: 640px; max-height: 44dvh; }
+    #panel.hasMode .panelHeader { display: flex; }
+    #panel.hasMode #panelBody { display: grid; grid-template-columns: 125px 1fr; gap: 10px; align-items: start; }
+    #panel.hasMode #modeSelection { grid-template-columns: 1fr; margin: 0; }
+    #panel.hasMode .inputRow { margin-top: 0; }
+    #panel.hasMode .inputRow { margin-right: 36px; }
+    #panel.hasMode #info, #panel.hasMode .dataCard { display: none; }
+    #panel.isCollapsed .panelHeader { position: static; }
 }
-
-
-/* =================================================
-   MAIN CONTROL PANEL
-================================================= */
-
-#panel {
-    position: fixed;
-    top: 12px;
-    left: 12px;
-    width: 290px;
-    max-width: calc(100vw - 24px);
-    padding: 15px;
-    background: rgba(8, 15, 22, 0.93);
-    color: white;
-    border-radius: 16px;
-    z-index: 1000;
-    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(8px);
-}
-
-#panel h1 {
-    margin: 0;
-    text-align: center;
-    color: #45b6ff;
-    font-size: 21px;
-}
-
-#subtitle {
-    text-align: center;
-    color: #cccccc;
-    font-size: 11px;
-    margin: 5px 0 13px;
-}
-
-
-/* =================================================
-   MODE SELECTION
-================================================= */
-
-#modeSelection {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 7px;
-}
-
-#stackMode {
-    background: #45b6ff;
-    color: white;
-}
-
-#queueMode {
-    background: #45d6a0;
-    color: white;
-}
-
-
-/* =================================================
-   OPERATION PANEL
-================================================= */
-
-#operations {
-    display: none;
-}
-
-#valueInput {
-    width: 100%;
-    padding: 9px;
-    border: none;
-    border-radius: 8px;
-    margin-bottom: 7px;
-    font-size: 13px;
-    text-align: center;
-}
-
-.operationButtons {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 7px;
-}
-
-button {
-    border: none;
-    border-radius: 8px;
-    padding: 10px 5px;
-    background: white;
-    color: #111;
-    font-size: 12px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-button:hover {
-    background: #e5f5ff;
-}
-
-#pushButton {
-    background: #45b6ff;
-    color: white;
-}
-
-#popButton {
-    background: #ff6b6b;
-    color: white;
-}
-
-#peekButton {
-    background: #ffd34d;
-    color: #111;
-}
-
-#enqueueButton {
-    background: #45d6a0;
-    color: white;
-}
-
-#dequeueButton {
-    background: #ff6b6b;
-    color: white;
-}
-
-#frontButton {
-    background: #ffd34d;
-    color: #111;
-}
-
-#resetButton,
-#queueResetButton {
-    background: #dddddd;
-    color: #111;
-}
-
-#backButton {
-    margin-top: 7px;
-    width: 100%;
-    background: #555;
-    color: white;
-}
-
-
-/* =================================================
-   INFORMATION
-================================================= */
-
-#info {
-    margin-top: 10px;
-    padding: 10px;
-    background: rgba(255, 255, 255, 0.10);
-    border-radius: 9px;
-    text-align: center;
-    font-size: 11px;
-    line-height: 1.5;
-    min-height: 65px;
-}
-
-#dataStatus {
-    margin-top: 8px;
-    padding: 8px;
-    background: rgba(69, 182, 255, 0.15);
-    border-radius: 8px;
-    text-align: center;
-    font-size: 11px;
-    color: #8ed6ff;
-}
-
-
-/* =================================================
-   AR STATUS
-================================================= */
-
-#status {
-    position: fixed;
-    bottom: 15px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 8px 16px;
-    background: rgba(0, 0, 0, 0.82);
-    color: white;
-    border-radius: 18px;
-    z-index: 1000;
-    font-size: 11px;
-    white-space: nowrap;
-}
-
-
-/* =================================================
-   MODE LABEL
-================================================= */
-
-#modeLabel {
-    display: none;
-    margin-top: 10px;
-    padding: 8px;
-    border-radius: 8px;
-    text-align: center;
-    font-weight: bold;
-    font-size: 13px;
-    background: rgba(69, 182, 255, 0.18);
-    color: #45b6ff;
-}
-
-
-/* =================================================
-   ARRAY SIZE
-================================================= */
-
-#arrayInfo {
-    margin-top: 6px;
-    padding: 7px 8px;
-    background: rgba(69, 182, 255, 0.10);
-    border-radius: 8px;
-    text-align: center;
-    font-size: 10px;
-    color: #bfe8ff;
-}
-
-
-/* =================================================
-   OVERFLOW / UNDERFLOW WARNING
-================================================= */
-
-#warning {
-    display: none;
-    margin-top: 6px;
-    padding: 7px 8px;
-    background: rgba(255, 107, 107, 0.13);
-    border: 1px solid rgba(255, 107, 107, 0.55);
-    border-radius: 8px;
-    text-align: center;
-    font-size: 10px;
-    color: #ff9a9a;
-    font-weight: bold;
-    line-height: 1.35;
-}
-
-
-/* =================================================
-   PSEUDOCODE BUTTON
-================================================= */
-
-#pseudocodeButton {
-    display: block;
-    margin-top: 7px;
-    width: 100%;
-    background: #8e7dff;
-    color: white;
-}
-
-
-/* =================================================
-   PSEUDOCODE MODAL
-   Centered and responsive on phones and computers
-================================================= */
-
-#pseudocodePanel {
-    display: none;
-
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    right: auto;
-    bottom: auto;
-
-    transform: translate(-50%, -50%);
-
-    width: calc(100vw - 24px);
-    max-width: 380px;
-    max-height: 75vh;
-
-    box-sizing: border-box;
-    margin: 0;
-    padding: 14px;
-
-    overflow-x: hidden;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-
-    background: rgba(8, 15, 22, 0.98);
-    color: white;
-
-    border: 1px solid rgba(69, 182, 255, 0.35);
-    border-radius: 14px;
-
-    z-index: 10001;
-
-    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.65);
-}
-
-
-/* =================================================
-   PSEUDOCODE HEADER
-================================================= */
-
-#pseudocodePanel .pseudoHeader {
-    position: sticky;
-    top: -14px;
-    z-index: 2;
-
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 8px;
-
-    margin: -2px 0 9px;
-    padding: 8px 0;
-
-    background: rgba(8, 15, 22, 0.98);
-
-    color: #45b6ff;
-    font-size: 15px;
-    font-weight: bold;
-}
-
-#pseudocodePanel .pseudoHeader span {
-    min-width: 0;
-    overflow-wrap: anywhere;
-}
-
-#pseudocodePanel .pseudoClose {
-    flex-shrink: 0;
-    width: auto;
-    min-width: 30px;
-    padding: 5px 9px;
-    background: #555;
-    color: white;
-}
-
-
-/* =================================================
-   PSEUDOCODE CONTENT
-================================================= */
-
-#pseudocodePanel .pseudoSection h3 {
-    margin: 8px 0;
-    color: #45b6ff;
-    font-size: 14px;
-}
-
-#pseudocodePanel .pseudoSection h4 {
-    margin: 8px 0 4px;
-    color: #ffd34d;
-    font-size: 11px;
-}
-
-#pseudocodePanel .pseudoSection pre {
-    max-width: 100%;
-    box-sizing: border-box;
-    margin: 0;
-    padding: 9px;
-
-    overflow-wrap: anywhere;
-    white-space: pre-wrap;
-    word-break: normal;
-
-    background: rgba(255, 255, 255, 0.07);
-    border-radius: 7px;
-
-    color: #f1f1f1;
-    font-size: 10px;
-    line-height: 1.5;
-    font-family: Consolas, monospace;
-}
-
-
-/* =================================================
-   SMALL SCREENS
-================================================= */
-
-@media (max-width: 400px) {
-    #pseudocodePanel {
-        width: calc(100vw - 24px);
-        max-width: none;
-        max-height: 75vh;
-        padding: 12px;
-    }
-
-    #pseudocodePanel .pseudoHeader {
-        top: -12px;
-        font-size: 14px;
-    }
-
-    #pseudocodePanel .pseudoSection pre {
-        font-size: 10px;
-    }
-}
-#pseudocodePanel {
-    position: fixed !important;
-
-    left: 12px !important;
-    right: 12px !important;
-    top: 50% !important;
-    bottom: auto !important;
-
-    width: auto !important;
-    max-width: 380px !important;
-    max-height: 75vh !important;
-
-    margin-left: auto !important;
-    margin-right: auto !important;
-
-    transform: translateY(-50%) !important;
-
-    box-sizing: border-box !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
