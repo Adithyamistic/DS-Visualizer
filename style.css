@@ -1,29 +1,419 @@
+
+/* =================================================
+   GLOBAL STYLES
+================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0;
     overflow: hidden;
     font-family: Arial, sans-serif;
 }
 
+
+/* =================================================
+   MAIN CONTROL PANEL
+================================================= */
+
+#panel {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    width: 290px;
+    max-width: calc(100vw - 24px);
+    padding: 15px;
+    background: rgba(8, 15, 22, 0.93);
+    color: white;
+    border-radius: 16px;
+    z-index: 1000;
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+}
+
+#panel h1 {
+    margin: 0;
+    text-align: center;
+    color: #45b6ff;
+    font-size: 21px;
+}
+
+#subtitle {
+    text-align: center;
+    color: #cccccc;
+    font-size: 11px;
+    margin: 5px 0 13px;
+}
+
+
+/* =================================================
+   MODE SELECTION
+================================================= */
+
+#modeSelection {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 7px;
+}
+
+#stackMode {
+    background: #45b6ff;
+    color: white;
+}
+
+#queueMode {
+    background: #45d6a0;
+    color: white;
+}
+
+
+/* =================================================
+   OPERATION PANEL
+================================================= */
+
+#operations {
+    display: none;
+}
+
+#valueInput {
+    width: 100%;
+    padding: 9px;
+    border: none;
+    border-radius: 8px;
+    margin-bottom: 7px;
+    font-size: 13px;
+    text-align: center;
+}
+
+.operationButtons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 7px;
+}
+
+button {
+    border: none;
+    border-radius: 8px;
+    padding: 10px 5px;
+    background: white;
+    color: #111;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #e5f5ff;
+}
+
+#pushButton {
+    background: #45b6ff;
+    color: white;
+}
+
+#popButton {
+    background: #ff6b6b;
+    color: white;
+}
+
+#peekButton {
+    background: #ffd34d;
+    color: #111;
+}
+
+#enqueueButton {
+    background: #45d6a0;
+    color: white;
+}
+
+#dequeueButton {
+    background: #ff6b6b;
+    color: white;
+}
+
+#frontButton {
+    background: #ffd34d;
+    color: #111;
+}
+
+#resetButton,
+#queueResetButton {
+    background: #dddddd;
+    color: #111;
+}
+
+#backButton {
+    margin-top: 7px;
+    width: 100%;
+    background: #555;
+    color: white;
+}
+
+
+/* =================================================
+   INFORMATION
+================================================= */
+
+#info {
+    margin-top: 10px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.10);
+    border-radius: 9px;
+    text-align: center;
+    font-size: 11px;
+    line-height: 1.5;
+    min-height: 65px;
+}
+
+#dataStatus {
+    margin-top: 8px;
+    padding: 8px;
+    background: rgba(69, 182, 255, 0.15);
+    border-radius: 8px;
+    text-align: center;
+    font-size: 11px;
+    color: #8ed6ff;
+}
+
+
+/* =================================================
+   AR STATUS
+================================================= */
+
 #status {
     position: fixed;
-    top: 20px;
+    bottom: 15px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 9999;
+    padding: 8px 16px;
+    background: rgba(0, 0, 0, 0.82);
+    color: white;
+    border-radius: 18px;
+    z-index: 1000;
+    font-size: 11px;
+    white-space: nowrap;
+}
 
-    background: rgba(0, 0, 0, 0.75);
+
+/* =================================================
+   MODE LABEL
+================================================= */
+
+#modeLabel {
+    display: none;
+    margin-top: 10px;
+    padding: 8px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 13px;
+    background: rgba(69, 182, 255, 0.18);
+    color: #45b6ff;
+}
+
+
+/* =================================================
+   ARRAY SIZE
+================================================= */
+
+#arrayInfo {
+    margin-top: 6px;
+    padding: 7px 8px;
+    background: rgba(69, 182, 255, 0.10);
+    border-radius: 8px;
+    text-align: center;
+    font-size: 10px;
+    color: #bfe8ff;
+}
+
+
+/* =================================================
+   OVERFLOW / UNDERFLOW WARNING
+================================================= */
+
+#warning {
+    display: none;
+    margin-top: 6px;
+    padding: 7px 8px;
+    background: rgba(255, 107, 107, 0.13);
+    border: 1px solid rgba(255, 107, 107, 0.55);
+    border-radius: 8px;
+    text-align: center;
+    font-size: 10px;
+    color: #ff9a9a;
+    font-weight: bold;
+    line-height: 1.35;
+}
+
+
+/* =================================================
+   PSEUDOCODE BUTTON
+================================================= */
+
+#pseudocodeButton {
+    display: block;
+    margin-top: 7px;
+    width: 100%;
+    background: #8e7dff;
+    color: white;
+}
+
+
+/* =================================================
+   PSEUDOCODE MODAL
+   Centered and responsive on phones and computers
+================================================= */
+
+#pseudocodePanel {
+    display: none;
+
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    right: auto;
+    bottom: auto;
+
+    transform: translate(-50%, -50%);
+
+    width: calc(100vw - 24px);
+    max-width: 380px;
+    max-height: 75vh;
+
+    box-sizing: border-box;
+    margin: 0;
+    padding: 14px;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+
+    background: rgba(8, 15, 22, 0.98);
     color: white;
 
-    padding: 12px 20px;
-    border-radius: 10px;
+    border: 1px solid rgba(69, 182, 255, 0.35);
+    border-radius: 14px;
 
-    font-size: 18px;
-}#camera {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    z-index: -2;
+    z-index: 10001;
+
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.65);
 }
+
+
+/* =================================================
+   PSEUDOCODE HEADER
+================================================= */
+
+#pseudocodePanel .pseudoHeader {
+    position: sticky;
+    top: -14px;
+    z-index: 2;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+
+    margin: -2px 0 9px;
+    padding: 8px 0;
+
+    background: rgba(8, 15, 22, 0.98);
+
+    color: #45b6ff;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+#pseudocodePanel .pseudoHeader span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+#pseudocodePanel .pseudoClose {
+    flex-shrink: 0;
+    width: auto;
+    min-width: 30px;
+    padding: 5px 9px;
+    background: #555;
+    color: white;
+}
+
+
+/* =================================================
+   PSEUDOCODE CONTENT
+================================================= */
+
+#pseudocodePanel .pseudoSection h3 {
+    margin: 8px 0;
+    color: #45b6ff;
+    font-size: 14px;
+}
+
+#pseudocodePanel .pseudoSection h4 {
+    margin: 8px 0 4px;
+    color: #ffd34d;
+    font-size: 11px;
+}
+
+#pseudocodePanel .pseudoSection pre {
+    max-width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 9px;
+
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+    word-break: normal;
+
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 7px;
+
+    color: #f1f1f1;
+    font-size: 10px;
+    line-height: 1.5;
+    font-family: Consolas, monospace;
+}
+
+
+/* =================================================
+   SMALL SCREENS
+================================================= */
+
+@media (max-width: 400px) {
+    #pseudocodePanel {
+        width: calc(100vw - 24px);
+        max-width: none;
+        max-height: 75vh;
+        padding: 12px;
+    }
+
+    #pseudocodePanel .pseudoHeader {
+        top: -12px;
+        font-size: 14px;
+    }
+
+    #pseudocodePanel .pseudoSection pre {
+        font-size: 10px;
+    }
+}
+#pseudocodePanel {
+    position: fixed !important;
+
+    left: 12px !important;
+    right: 12px !important;
+    top: 50% !important;
+    bottom: auto !important;
+
+    width: auto !important;
+    max-width: 380px !important;
+    max-height: 75vh !important;
+
+    margin-left: auto !important;
+    margin-right: auto !important;
+
+    transform: translateY(-50%) !important;
+
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
